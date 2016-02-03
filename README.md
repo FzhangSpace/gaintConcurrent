@@ -1,5 +1,17 @@
 # gaintConcurrent 
 # 大并发服务器
+	
+	本项目使用cmake来动态编译源代码
+	Ubuntu下使用`sudo apt-get install cmake`安装cmake
+	
+	大致使用流程:
+		创建一个CMakeLists.txt文件,根据cmake的语法规则写文件
+		然后执行`cmake .`, cmake是CMakeLists.txt所在的目录位置
+		此时会生成一个build文件,在里面会自动生成一个Makefile
+		执行这个Makefile,文件会生成在build/bin这个文件夹中
+		
+	不过在本项目中,每个CMakeLists.txt的文件夹中有一个build.sh的脚本
+	这个脚本会自动执行makefile,并在项目根目录中的build/bin中生成程序
 
 ##poll
     
@@ -38,7 +50,8 @@
     	1. 调高进程文件描述符数目
     	2. 死等
     	3. 退出程序
-    	4. 通过应用层协议判断,关闭掉不必要的文件描述符(个人意见)
+    	4. 提前准备一个空闲的文件描述符
+    	5. 通过应用层协议判断,关闭掉不必要的文件描述符(个人意见)
     
     - 可能遇到的问题
     	1. 如果read之后的,缓冲区没有读取完毕,那如果此时重新调用poll函数,
@@ -57,7 +70,11 @@
     			取出应用层缓冲区的数据发送write(connfd,......);
     			如果应用层缓冲区的数据发送完毕,取消关注POLLOUT事件`
     			
-    	
+##cmake
+	
+	- ubuntu
+		
+	
     	
     	
     	
