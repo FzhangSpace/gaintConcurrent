@@ -1,7 +1,7 @@
 .PHONY:clean
 CC=g++
 CPPFLAGS=-Wall -g
-BIN=echosrv_poll 
+BIN=echosrv_poll echocli
 all:$(BIN)
 %.o:%.c
 	$(CC) $(CFLAGS) -c $< -o $@
