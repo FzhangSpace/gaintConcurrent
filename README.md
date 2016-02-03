@@ -1,7 +1,6 @@
-
+[TOC]
 # gaintConcurrent 
 # 大并发服务器
-[TOC]
 	
 	本项目使用cmake来动态编译源代码
 	Ubuntu下使用`sudo apt-get install cmake`安装cmake
