@@ -1,5 +1,7 @@
+
 # gaintConcurrent 
 # 大并发服务器
+[TOC]
 	
 	本项目使用cmake来动态编译源代码
 	Ubuntu下使用`sudo apt-get install cmake`安装cmake
@@ -70,9 +72,6 @@
     			取出应用层缓冲区的数据发送write(connfd,......);
     			如果应用层缓冲区的数据发送完毕,取消关注POLLOUT事件`
     			
-##cmake
-	
-	- ubuntu
 		
 	
     	
