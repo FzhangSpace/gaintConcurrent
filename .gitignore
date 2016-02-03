@@ -1,1 +1,5 @@
-./bulid
+*.[oa]
+*.swp
+*~
+/bulid
+build/
