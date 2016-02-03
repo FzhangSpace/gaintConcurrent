@@ -15,6 +15,9 @@
 
 ##poll
     
+    每次调用poll函数的时候,都需要把监听套接字与已接入的套接字所感兴趣的事件数组拷贝到内核空间
+    所以效率会比较低
+    
     - SIGPIPE信号
         如果客户端先关闭套接字close,而此时服务器调用一次write,服务器会接收一个RST segment(TCP传输层),
         如果服务器再次调用了write,这个时候就会产生SIGPIPE,SIGPIPE默认动作是关闭进程.
@@ -71,7 +74,37 @@
     			如果应用层缓冲区的数据发送完毕,取消关注POLLOUT事件`
     			
 		
+##epoll
+
+	- LT 水平触发模式 和poll运行方式大致相同
+		在高电平的时候,触发事件,	
 	
+	- ET 边缘触发模式
+		在低电平到高电平之间的时候,触发事件
+	
+		由于使用的是边缘触发模式,在一次触发读事件之后,如果没有把内容读空,
+		如果读到一半,就重新监听的话,就算还有数据也不会再次触发读事件了,
+		只有下一次有新的内容发送过来的时候,才会重新触发读事件,
+		所以使用ET模式的话,一定要把非阻塞文件描述符读到EAGAIN错误,
+		否则就会导致错误发生
+		
+		eg: 
+			listenfd EPOLLIN事件到来
+			connfd = accept(...);
+			关注connfd的EPOLLIN事件与EPOLLOUT事件
+			
+			处理活跃套接字
+			connfd EPOLLIN事件到来
+			read(connfd, ...);
+			read直到返回EAGAIN错误
+			ret = write(connfd, buf, 10000);
+			if (ret < 10000)
+				将未发送完的数据添加到应用层缓冲区OutBuffer
+			connfd EPOLLOUT事件到来
+			取出应用层缓冲区中的数据发送 write(connfd, ...);
+			直到应用层缓冲区数据发完,或者发送返回EAGAIN
+		
+		
     	
     	
     	
