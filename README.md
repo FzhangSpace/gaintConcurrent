@@ -104,7 +104,56 @@
 			取出应用层缓冲区中的数据发送 write(connfd, ...);
 			直到应用层缓冲区数据发完,或者发送返回EAGAIN
 		
+##muduo库
+	
+	- 安装
+		sudo apt-get install cmake
+		sudo apt-get install libboost-dev
 		
+		muduo的源码可以直接从github上下载
+		https://github.com/chenshuo/muduo.git
+		
+		使用source insight查看代码
+		
+		安装TabSiPlus分页插件
+		
+##面向对象的线程类
+
+	通过继承对象,重写成员函数来使用线程类
+
+	成员函数的第一个参数是this,如果回调,是thiscall约定,
+	而一般的C语言的回调是普通的函数约定,所以一般的成员函数,作为回调函数使用 
+	但是静态成员函数可以.
+	
+	虚函数具有回调的功能
+	线程对象的生命周期与线程的生命周期是不一样
+	
+	线程执行完毕,线程对象能够自动销毁
+		方法就是:首先对象要动态创建,才可以动态销毁
+				设置一个状态字,当Run()函数运行完之后,判断状态字
+				是真就delete销毁对象,所以要有一个成员函数来单独设置销毁的状态字
+
+##基于对象的线程类			
+
+	通过直接调用线程类,传入回调函数来执行任务
+
+	- boost
+		函数适配器:boost_test,把memberFunc(this, double, int, int)四个参数的成员函数,
+			适配成一个void (int)的一个参数的函数, _1是参数占位符
+	- explicit
+		修饰的函数不会执行隐士转换
+	
+	
+	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
     	
     	
     	
