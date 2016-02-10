@@ -73,7 +73,6 @@
     			取出应用层缓冲区的数据发送write(connfd,......);
     			如果应用层缓冲区的数据发送完毕,取消关注POLLOUT事件`
     			
-		
 ##epoll
 
 	- LT 水平触发模式 和poll运行方式大致相同
@@ -104,19 +103,6 @@
 			取出应用层缓冲区中的数据发送 write(connfd, ...);
 			直到应用层缓冲区数据发完,或者发送返回EAGAIN
 		
-##muduo库
-	
-	- 安装
-		sudo apt-get install cmake
-		sudo apt-get install libboost-dev
-		
-		muduo的源码可以直接从github上下载
-		https://github.com/chenshuo/muduo.git
-		
-		使用source insight查看代码
-		
-		安装TabSiPlus分页插件
-		
 ##面向对象的线程类
 
 	通过继承对象,重写成员函数来使用线程类
@@ -135,15 +121,89 @@
 
 ##基于对象的线程类			
 
-	通过直接调用线程类,传入回调函数来执行任务
+	通过直接调用线程类,传入回调函数来执行任务 
+	可以通过boost的bind函数,把成员函数传入
 
 	- boost
 		函数适配器:boost_test,把memberFunc(this, double, int, int)四个参数的成员函数,
 			适配成一个void (int)的一个参数的函数, _1是参数占位符
 	- explicit
-		修饰的函数不会执行隐士转换
+		修饰的函数不会执行隐式转换
 	
+##muduo库
+
+###安装
+	sudo apt-get install cmake
+	sudo apt-get install libboost-dev
 	
+	muduo的源码可以直接从github上下载
+	https://github.com/chenshuo/muduo.git
+	
+	使用source insight查看代码
+	
+	安装TabSiPlus分页插件
+
+### muduo_base库源码分析
+
+	#### Timestamp类封装,时间戳类		
+		继承的基类
+			muduo::copyable 空基类,标示类,值类型,
+					凡是继承自这个基类的类都是可以拷贝的
+			boost::less_than_complate<Timestamp> 是boost <base/types.h>里面的类模板
+					一旦继承这个类,就必须实现<运算符重载,然会他会自动实现>,<=,>=
+		
+		类unix系统的时间起始点是1970-01-01 00:00:00
+		
+		BOOST_STATIC_ASSERT:编译时断言  <boost/static_assert.hpp>
+			BOOST_STATOC_ASSERT(sizeof(int) == sizeof(short));
+			上面这条语句在编译是就会判断,导致编译出错
+				error: invalid application of ‘sizeof’ to incomplete type ‘boost::STATIC_ASSERTION_FAILURE<false>’
+ 				BOOST_STATIC_ASSERT(sizeof(int) == sizeof(short));
+		
+		assert是运行时断言
+		
+		使用PRld64
+			int64_t 表示64为整数,在32位系统中打印是printf("%lld", value);
+								 在64位系统中打印是printf("%ld", value);
+								 
+			跨平台的做法是:
+				#define _STDC_FORMAT_MACROS
+				#include <inttypes.h>
+				#undef _STDC_FORMAT_MACROS
+				
+				printf("%" PRId64 "\n", value);
+		
+		Timestamp实现及测试
+
+		这个是这个类的测试用例
+		muduo/muduo/base/tests/Timestamp_unittest.cc
+		
+	#### 原子性操作
+		gcc提供了一系列原子性操作
+		//原子自增操作
+		type __sync_fetch_and_add (type *ptr, type value);
+		
+		//原子比较和交换(设置)操作
+		type __sync_val_compare_and_swap(type *ptr, type oldval type newval)
+		bool __sync_bool_compare_and_Swap(type *ptr, type oldval type newval)
+		
+		//原子赋值操作
+		type __sync_lock_test_and_set(type *ptr, type value)
+		使用这些原子操作,编译时需要加 -march=cpu-type
+		
+		参考博文:http://www.cnblogs.com/FrankTan/archive/2010/12/11/1903377.html
+
+	#### AtomicIntegerT类封装, 原子性整数操作
+		实现了自增,自减,前自增,和后自增,自减相同
+	
+		- 继承的基类
+			boost::noncopyable  不可拷贝的类, 大体原理就是把=运算符做成私有的
+	
+		- return value
+			因为都是原子性操作,所以返回的时候不需要再找一个值来作为中间值,直接从函数返回即可
+	
+
+### muduo_net库源码分析
 	
     	
     	
