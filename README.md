@@ -212,6 +212,16 @@
 
 ####Exception类实现
 
+	主要作用是抛异常
+		使用这个类抛异常,可以显示出错时函数运行状态,是怎样的嵌套关系
+		定位问题点
+	
+	- backtrace, 栈回溯,保存各个栈帧的地址
+	
+	- backtrace_symbols, 根据地址,转成相应的函数符号
+	
+	- abi::__cxa_demangle
+
 ### muduo_net库源码分析
 	
     	
