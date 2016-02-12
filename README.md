@@ -222,6 +222,35 @@
 	
 	- abi::__cxa_demangle
 
+####线程封装
+
+	- 线程标识符
+		pthread_self
+		gettid()可以得到tid,但glibc并没有实现该函数,只能通过Linux的系统调用syscall来获取
+			return syscall(SYS_gettid)
+			
+	- __thread, gcc内置的线程局部存储设施
+		__thread只能修饰POD类型, 线程销毁,该变量也销毁
+		POD类型(plain old data), 与C兼容的原始数据,
+		例如,结构和整型等C语言中的类型是POD类型,
+		但带有用户定义的构造函数或虚函数的类则不是
+		
+	- boost::is_same
+	
+	- pthread_atfork
+		主要的作用就是清理fork前后,锁的状态
+	
+		int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));  
+		
+		这一函数的作用是为fork安装三个帮助清理锁的函数。其中：
+		    prepare函数由父进程在fork创建子进程之前调用，这个fork处理程序的任务是获取父进程定义的所有锁；
+		    parent函数在fork创建子进程后，但在fork返回之前在父进程环境中调用的，其任务是对prepare获取的所有锁进行解锁；
+		    child函数是在fork返回前在子进程环境中调用的，和parent函数一样，child函数也必须释放prepare处理函数中的所有的锁。
+	 	
+	 	重点来了，看似这里会出现加锁一次，解锁两次的情况。其实不然，因为fork后对锁进行操作时，
+	 	子进程和父进程通过写时复制已经不对相关的地址空间进行共享了，所以，此时对于父进程，
+	 	其释放原有自己在prepare中获取的锁，而子进程则释放从父进程处继承来的相关锁。两个并不冲突。
+
 ### muduo_net库源码分析
 	
     	
