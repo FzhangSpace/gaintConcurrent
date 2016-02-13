@@ -236,6 +236,7 @@
 		但带有用户定义的构造函数或虚函数的类则不是
 		
 	- boost::is_same
+		判定两种类型是否相同
 	
 	- pthread_atfork
 		主要的作用就是清理fork前后,锁的状态
@@ -250,6 +251,14 @@
 	 	重点来了，看似这里会出现加锁一次，解锁两次的情况。其实不然，因为fork后对锁进行操作时，
 	 	子进程和父进程通过写时复制已经不对相关的地址空间进行共享了，所以，此时对于父进程，
 	 	其释放原有自己在prepare中获取的锁，而子进程则释放从父进程处继承来的相关锁。两个并不冲突。
+
+	创建一个线程类的基本过程
+		首先创建一个Thread类,把回调函数传进去, 
+		然后就是Thread::start()
+		此时start()函数会创建一个ThreadData类,并把回调函数传进去,
+		然后调用pthread_create运行detail::startThread,参数就传刚创建的ThreadData这个对象
+		然后在detail::startThread里面,会调用ThreadData::runInThread 函数
+		在ThreadData::runInThread这个函数中调用我们想让他调用的那个回调
 
 ### muduo_net库源码分析
 	

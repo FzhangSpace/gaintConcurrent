@@ -1,7 +1,8 @@
 #include <muduo/base/Thread.h>
+#include <muduo/base/Timestamp.h>
 #include <muduo/base/CurrentThread.h>
 #include <muduo/base/Exception.h>
-#include <muduo/base/Logging.h>
+//#include <muduo/base/Logging.h>
 
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -19,19 +20,20 @@ namespace muduo
 {
 namespace CurrentThread
 {
-    __thread int t_cachedTid = 0;
-    __thread char t_tidString[32];
+    // __thread 修饰的变量是线程局部存储的
+    __thread int t_cachedTid = 0;   //线程真实pid(tid)的缓存
+    __thread char t_tidString[32];  //这是tid的字符串表现形式
     __thread int t_tidStringLength = 6;
-    __thread const char * t_threadName = "unknown";
+    __thread const char * t_threadName = "unknown"; //线程的名字
     const bool sameType = boost::is_same<int, pid_t>::value;
     BOOST_STATIC_ASSERT(sameType);
 }
 
 namespace detail
 {
-    pid_t gittid()
+    pid_t gettid()
     {
-        return static_cast<pid_t>(::syscall(SYS_gittid));
+        return static_cast<pid_t>(::syscall(SYS_gettid));
     }
 
     void afterFork()
@@ -49,7 +51,7 @@ namespace detail
         {
             muduo::CurrentThread::t_threadName = "main";
             CurrentThread::tid();
-            pthread_atfork(NULL, NULL, &atherFork);
+            pthread_atfork(NULL, NULL, &afterFork);
         }
     };
 
@@ -79,7 +81,7 @@ namespace detail
             }
 
             muduo::CurrentThread::t_threadName = name_.empty() ? "muduoThread" : name_.c_str();
-            ::proctl(PR_SET_NAME, muduo::CurrentThread::t_threadName);
+            ::prctl(PR_SET_NAME, muduo::CurrentThread::t_threadName);
             try {
                 func_();
                 muduo::CurrentThread::t_threadName = "finished";
@@ -87,11 +89,11 @@ namespace detail
                 muduo::CurrentThread::t_threadName = "crashed";
                 fprintf(stderr, "exception caught in Thread %s\n", name_.c_str());
                 fprintf(stderr, "reason: %s\n", ex.what());
-                fprintf(stderr, "stack trace : %s\n", ex.stackTreace());
+                fprintf(stderr, "stack trace : %s\n", ex.stackTrace());
                 abort();
             } catch (...) {
                 muduo::CurrentThread::t_threadName = "crashed";
-                fprintf(stderr, "unknow exception  caught in Thread %s\n", name.c_str());
+                fprintf(stderr, "unknow exception  caught in Thread %s\n", name_.c_str());
                 throw;  //rethrow
             }
         }
@@ -122,10 +124,10 @@ bool CurrentThread::isMainThread()
     return tid() == ::getpid();
 }
 
-void CurrentThread::sleeoUsec(int64_t usec)
+void CurrentThread::sleepUsec(int64_t usec)
 {
     struct timespec ts = {0, 0};
-    ts.tv_sec = static_cast<time_t>(usec / Timestamp::KMicroSecondsPerSecond);
+    ts.tv_sec = static_cast<time_t>(usec / Timestamp::kMicroSecondsPerSecond);
     ts.tv_nsec = static_cast<long>(usec % Timestamp::kMicroSecondsPerSecond * 1000);
     ::nanosleep(&ts, NULL);
 }
@@ -174,7 +176,7 @@ void Thread::start()
     if (pthread_create(&pthreadId_, NULL, &detail::startThread, data)) {
         started_ = false;
         delete data;
-        LOG_SYSFATAL << "Failed in pthread_ create";
+        //LOG_SYSFATAL << "Failed in pthread_ create";
     }
 }
 
