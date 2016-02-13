@@ -260,6 +260,22 @@
 		然后在detail::startThread里面,会调用ThreadData::runInThread 函数
 		在ThreadData::runInThread这个函数中调用我们想让他调用的那个回调
 
+####IPC机制封装
+	
+	- MutexLock/MutexLockGuard	互斥锁
+		__typeof__(var) 是gcc对C语言的一个扩展保留字，用于声明变量类型,
+			var可以是数据类型（int， char*..),也可以是变量表达式。
+	
+		MutexLockGuard
+			这个类仅仅是关联了MutexLockGuard这个类
+			
+			
+			
+	- Condition	条件变量
+	
+	- CountDownLatch 倒计时门闩
+
+
 ### muduo_net库源码分析
 	
     	
