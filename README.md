@@ -268,14 +268,35 @@
 	
 		MutexLockGuard
 			这个类仅仅是关联了MutexLockGuard这个类
-			
+		
+		__attribute__ 
+			__attribute__机制。__attribute__可以设置函数属性（Function     Attribute）、
+				变量属性（Variable Attribute）和类型属性（Type Attribute）。
+		参考http://blog.csdn.net/ruixj/article/details/4274721	
 			
 			
 	- Condition	条件变量
+		条件变量需要和mutex一起使用
+			
+			线程1						线程2
+				锁住mutex					锁住mutex
+					while(条件) 				更改条件
+						等待					signal或broadcast
+			  	解锁						解锁
 	
 	- CountDownLatch 倒计时门闩
-
-
+		对条件变量的进一步封装
+		既可以用于所有子线程等待主线程发起"起跑"命令
+		也可以用于主线程等待子线程初始化完毕才开始工作
+		
+		mutable
+			在C++中，mutable也是为了突破const的限制而设置的。
+			被mutable修饰的变量(mutable只能由于修饰类的非静态数据成员)，
+			将永远处于可变的状态，即使在一个const函数中。
+			
+			
+			
+			
 ### muduo_net库源码分析
 	
     	

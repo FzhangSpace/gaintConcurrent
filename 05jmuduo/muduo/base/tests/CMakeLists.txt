@@ -1,6 +1,12 @@
 add_executable(atomic_unittest Atomic_unittest.cc)
 #target_link_libraries(atomic_unittest muduo_base)
 
+add_executable(countdownlatch_test1 CountDownLatch_test1.cc)
+target_link_libraries(countdownlatch_test1 muduo_base)
+
+add_executable(countdownlatch_test2 CountDownLatch_test2.cc)
+target_link_libraries(countdownlatch_test2 muduo_base)
+
 add_executable(exception_test Exception_test.cc)
 target_link_libraries(exception_test muduo_base)
 
